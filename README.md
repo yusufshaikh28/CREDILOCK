@@ -14,6 +14,13 @@ CrediLock verifies identity documents (Aadhaar, PAN) through a multi-step pipeli
 5. **Risk Scoring** — assigns Low / Medium / High risk based on document integrity checks
 6. **Cryptographic Anchoring** — signs verified documents using Ed25519 digital signatures for tamper-evident audit trails
 7. **vCard Generation** — generates a verifiable identity card with transaction ID
+## Prerequisites
+- CMake installed
+- Visual C++ Build Tools (Windows) or gcc (Linux)
+- Python 3.10+
+
+Note: Some dependencies (PaddleOCR, face_recognition) require system-level libraries. 
+See requirements.txt for full list.
 
 ## Tech Stack
 
