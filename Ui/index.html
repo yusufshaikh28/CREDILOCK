@@ -1,0 +1,884 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Credilock</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f2f5ff;--white:#fff;--ink:#1a1d2e;--ink-2:#565c78;--ink-3:#9ba3c0;--accent:#3b5bdb;--accent-h:#3451c7;--accent-l:#eef1ff;--accent-b:#c5cff7;--green:#1b7d46;--green-bg:#e8f7ef;--green-b:#9fd9bc;--red:#c42b2b;--red-bg:#fff0f0;--red-b:#f8b4b4;--amber:#925500;--amber-bg:#fff8ec;--amber-b:#f5d49a;--border:#e2e8f8;--border-2:#cdd5ef;--r:18px;--rs:11px;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Nunito Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.5;}
+    .topbar{background:var(--white);border-bottom:1px solid var(--border);height:58px;display:flex;align-items:center;padding:0 28px;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(30,40,90,.07);}
+    .logo-wrap{display:flex;align-items:center;gap:10px;}
+    .logo-box{width:34px;height:34px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;}
+    .logo-box svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;}
+    .logo-name{font-family:'Nunito',sans-serif;font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-.02em;}
+    .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;font-size:12px;font-weight:600;}
+    .pill-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-b);}
+    .pill-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b);}
+    .pill-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+    .ghost-btn{padding:7px 15px;border-radius:99px;border:1px solid var(--border-2);background:var(--white);font-family:'Nunito Sans',sans-serif;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;transition:all .12s;}
+    .ghost-btn:hover{background:var(--accent-l);border-color:var(--accent-b);color:var(--accent);}
+    .page{max-width:740px;margin:0 auto;padding:40px 20px 80px;}
+    .step-rail{display:flex;align-items:center;justify-content:center;margin-bottom:40px;}
+    .step{display:flex;align-items:center;gap:8px;cursor:default;}
+    .step.clickable{cursor:pointer;}
+    .step-num{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;border:2px solid var(--border-2);color:var(--ink-3);background:var(--white);transition:all .25s;flex-shrink:0;}
+    .step-num.active{border-color:var(--accent);color:var(--accent);background:var(--accent-l);box-shadow:0 0 0 4px rgba(59,91,219,.1);}
+    .step-num.done{border-color:var(--green);background:var(--green);color:white;}
+    .step-num.done svg{width:16px;height:16px;stroke:white;fill:none;stroke-width:2.8;stroke-linecap:round;}
+    .step-text{font-size:13px;font-weight:600;color:var(--ink-3);white-space:nowrap;}
+    .step-text.active{color:var(--accent);}
+    .step-text.done{color:var(--green);}
+    .step-line{width:52px;height:2px;background:var(--border);margin:0 6px;border-radius:99px;flex-shrink:0;transition:background .3s;}
+    .step-line.done{background:var(--green);}
+    .card{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:28px 32px;margin-bottom:14px;animation:up .2s ease;}
+    @keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .card-title{font-family:'Nunito',sans-serif;font-size:18px;font-weight:800;color:var(--ink);margin-bottom:5px;}
+    .card-sub{font-size:13px;color:var(--ink-2);margin-bottom:20px;}
+    .drop-zone{border:2px dashed var(--accent-b);border-radius:var(--rs);background:var(--accent-l);min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;position:relative;transition:all .15s;}
+    .drop-zone:hover,.drop-zone.drag{border-color:var(--accent);background:#e6ebff;}
+    .drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+    .drop-icon{width:52px;height:52px;border-radius:14px;background:var(--white);border:1px solid var(--accent-b);display:flex;align-items:center;justify-content:center;}
+    .drop-icon svg{width:24px;height:24px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;}
+    .drop-label{font-size:14px;color:var(--ink-2);text-align:center;}
+    .drop-label strong{color:var(--accent);font-weight:700;}
+    .drop-formats{font-size:12px;color:var(--ink-3);}
+    .preview-img{width:100%;max-height:230px;object-fit:contain;border-radius:var(--rs);display:block;}
+    .cam-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+    .sm-btn{padding:8px 16px;border-radius:99px;border:1px solid var(--border-2);background:var(--white);font-family:'Nunito Sans',sans-serif;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;transition:all .12s;}
+    .sm-btn:hover{border-color:var(--accent-b);color:var(--accent);background:var(--accent-l);}
+    .primary-btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:99px;background:var(--accent);color:white;border:none;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:background .15s,transform .1s;letter-spacing:-.01em;}
+    .primary-btn:hover{background:var(--accent-h);}
+    .primary-btn:active{transform:scale(.97);}
+    .primary-btn:disabled{opacity:.4;cursor:not-allowed;}
+    .primary-btn svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;}
+    .file-chip{font-size:13px;color:var(--ink-2);background:var(--bg);border-radius:99px;padding:7px 14px;border:1px solid var(--border);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .check-list{display:flex;flex-direction:column;gap:10px;}
+    .check-btn{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:var(--rs);border:1.5px solid var(--border);background:var(--white);cursor:pointer;text-align:left;width:100%;font-family:'Nunito Sans',sans-serif;transition:all .12s;}
+    .check-btn:hover{border-color:var(--accent-b);background:var(--accent-l);transform:translateX(3px);}
+    .check-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+    .check-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .ci-green{background:var(--green-bg)}.ci-green svg{stroke:var(--green)}
+    .ci-blue{background:var(--accent-l)}.ci-blue svg{stroke:var(--accent)}
+    .ci-amber{background:var(--amber-bg)}.ci-amber svg{stroke:var(--amber)}
+    .check-icon svg{width:20px;height:20px;fill:none;stroke-width:2;stroke-linecap:round;}
+    .check-label{font-size:14px;font-weight:700;color:var(--ink);}
+    .check-sub{font-size:12px;color:var(--ink-2);margin-top:2px;}
+    .check-arrow{margin-left:auto;font-size:18px;color:var(--ink-3);flex-shrink:0;}
+    .verdict{border-radius:var(--rs);padding:20px 22px;display:flex;align-items:flex-start;gap:16px;border:1.5px solid;margin-bottom:14px;}
+    .verdict.pass{background:var(--green-bg);border-color:var(--green-b);}
+    .verdict.fail{background:var(--red-bg);border-color:var(--red-b);}
+    .verdict.warn{background:var(--amber-bg);border-color:var(--amber-b);}
+    .verdict-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .verdict.pass .verdict-icon{background:var(--green);}
+    .verdict.fail .verdict-icon{background:var(--red);}
+    .verdict.warn .verdict-icon{background:var(--amber);}
+    .verdict-icon svg{width:22px;height:22px;stroke:white;fill:none;stroke-width:2.8;stroke-linecap:round;}
+    .verdict-title{font-family:'Nunito',sans-serif;font-size:19px;font-weight:800;}
+    .verdict.pass .verdict-title{color:var(--green);}
+    .verdict.fail .verdict-title{color:var(--red);}
+    .verdict.warn .verdict-title{color:var(--amber);}
+    .verdict-desc{font-size:13px;color:var(--ink-2);margin-top:3px;}
+    .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+    .chip-red{font-size:12px;padding:3px 11px;border-radius:99px;font-weight:600;background:var(--red-bg);color:var(--red);border:1px solid var(--red-b);}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px;}
+    .cell{background:var(--bg);border-radius:var(--rs);padding:12px 14px;border:1px solid var(--border);}
+    .cell.full{grid-column:1/-1;}
+    .cell-label{font-size:11px;color:var(--ink-3);font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;}
+    .cell-val{font-size:14px;font-weight:600;color:var(--ink);}
+    .cell-val.mono{font-family:monospace;font-size:12px;font-weight:400;word-break:break-all;}
+    .cell-val.ok{color:var(--green);} .cell-val.warn{color:var(--amber);} .cell-val.bad{color:var(--red);}
+    .doc-tag{display:inline-block;font-size:12px;padding:3px 12px;border-radius:99px;font-weight:700;margin-bottom:14px;}
+    .dt-a{background:var(--accent-l);color:var(--accent);border:1px solid var(--accent-b);}
+    .dt-p{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-b);}
+    .dt-u{background:var(--bg);color:var(--ink-3);border:1px solid var(--border);}
+    .ocr-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;font-family:monospace;font-size:12px;line-height:1.8;color:var(--ink-2);white-space:pre-wrap;word-break:break-word;max-height:130px;overflow-y:auto;margin-top:4px;}
+    .slabel{font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px;margin-top:2px;}
+    .conf-row{display:flex;align-items:center;gap:18px;margin-bottom:14px;}
+    .ring-wrap{position:relative;width:78px;height:78px;flex-shrink:0;}
+    .ring-wrap svg{width:78px;height:78px;transform:rotate(-90deg);}
+    .ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-size:17px;font-weight:800;}
+    .conf-label{font-family:'Nunito',sans-serif;font-size:17px;font-weight:800;}
+    .conf-sub{font-size:13px;color:var(--ink-2);margin-top:3px;}
+    .anchor-already{background:var(--amber-bg);border:1.5px solid var(--amber-b);border-radius:var(--rs);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+    .anchor-already svg{width:20px;height:20px;stroke:var(--amber);fill:none;stroke-width:2;flex-shrink:0;}
+    .anchor-already-text{font-size:13px;color:var(--amber);font-weight:600;}
+    .input-row{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+    .input-label{font-size:12px;color:var(--ink-2);font-weight:700;}
+    .text-input{padding:10px 13px;border-radius:var(--rs);border:1.5px solid var(--border-2);background:var(--white);font-family:'Nunito Sans',sans-serif;font-size:14px;color:var(--ink);outline:none;width:100%;transition:border-color .15s;}
+    .text-input:focus{border-color:var(--accent);}
+    .text-input::placeholder{color:var(--ink-3);}
+    .face-banner{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--rs);border:1.5px solid;margin-bottom:0;font-size:13px;font-weight:600;margin-top:12px;}
+    .face-banner.enrolled{background:var(--green-bg);border-color:var(--green-b);color:var(--green);}
+    .face-banner.not-enrolled{background:var(--bg);border-color:var(--border);color:var(--ink-3);}
+    .face-banner.pending{background:var(--amber-bg);border-color:var(--amber-b);color:var(--amber);}
+    .face-banner svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;flex-shrink:0;}
+    /* face match upload area */
+    .match-upload-zone{border:2px dashed var(--accent-b);border-radius:var(--rs);background:var(--accent-l);padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;position:relative;transition:all .15s;margin-bottom:14px;}
+    .match-upload-zone:hover{border-color:var(--accent);background:#e6ebff;}
+    .match-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+    .match-upload-zone .drop-label{font-size:13px;}
+    .info-box{background:var(--accent-l);border:1.5px solid var(--accent-b);border-radius:var(--rs);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
+    .info-box svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2;flex-shrink:0;margin-top:1px;}
+    .info-box-text{font-size:13px;color:var(--accent);font-weight:500;line-height:1.5;}
+    .signed-entry{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);}
+    .signed-entry:last-child{border-bottom:none;}
+    .signed-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;}
+    .signed-txid{font-family:monospace;font-size:12px;color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .signed-time{font-size:11px;color:var(--ink-3);white-space:nowrap;}
+    .signed-badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700;background:var(--green-bg);color:var(--green);border:1px solid var(--green-b);flex-shrink:0;}
+    .search-row{display:flex;gap:8px;margin-bottom:14px;}
+    .search-input{flex:1;padding:10px 13px;border-radius:var(--rs);border:1.5px solid var(--border-2);background:var(--white);font-family:'Nunito Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;}
+    .search-input:focus{border-color:var(--accent);}
+    .search-input::placeholder{color:var(--ink-3);}
+    .search-btn{padding:10px 18px;border-radius:var(--rs);background:var(--accent);color:white;border:none;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+    .search-btn:hover{background:var(--accent-h);}
+    .nav-row{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;align-items:center;}
+    .back-btn{padding:10px 20px;border-radius:99px;border:1.5px solid var(--border-2);background:var(--white);font-family:'Nunito Sans',sans-serif;font-size:14px;font-weight:600;color:var(--ink-2);cursor:pointer;transition:all .12s;}
+    .back-btn:hover{background:var(--bg);}
+    .overlay{position:fixed;inset:0;background:rgba(26,29,46,.32);z-index:200;display:none;}
+    .overlay.open{display:block;}
+    .drawer{position:fixed;right:0;top:0;bottom:0;width:340px;background:var(--white);border-left:1px solid var(--border);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .24s ease;}
+    .drawer.open{transform:translateX(0);}
+    .drawer-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .drawer-title{font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;}
+    .drawer-x{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-2);}
+    .drawer-x:hover{background:var(--bg);}
+    .drawer-body{flex:1;overflow-y:auto;padding:10px 14px;}
+    .file-row{display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--rs);cursor:pointer;border:1px solid transparent;margin-bottom:3px;transition:all .1s;}
+    .file-row:hover{background:var(--accent-l);border-color:var(--accent-b);}
+    .file-row-icon{width:34px;height:34px;border-radius:8px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .file-row-icon svg{width:15px;height:15px;stroke:var(--ink-3);fill:none;stroke-width:1.5;stroke-linecap:round;}
+    .file-row-name{font-size:13px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .file-row-id{font-size:11px;color:var(--ink-3);font-family:monospace;}
+    .drawer-empty{text-align:center;padding:36px 0;color:var(--ink-3);font-size:13px;}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--ink);color:white;padding:12px 22px;border-radius:99px;font-size:14px;font-weight:600;z-index:500;transition:transform .22s,opacity .22s;opacity:0;pointer-events:none;white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+    .toast.err{background:var(--red);} .toast.warn{background:var(--amber);}
+    .empty-state{text-align:center;padding:32px 0;color:var(--ink-3);font-size:14px;}
+    .empty-state svg{display:block;margin:0 auto 10px;width:34px;height:34px;stroke:var(--ink-3);fill:none;stroke-width:1.3;stroke-linecap:round;}
+    ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:99px;}
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo-wrap">
+    <div class="logo-box"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+    <span class="logo-name">Credilock</span>
+  </div>
+  <div class="topbar-right">
+    <span class="pill pill-green" id="serverPill"><span class="pill-dot"></span><span id="serverLabel">Checking…</span></span>
+    <button class="ghost-btn" onclick="openDrawer()">Recent files</button>
+  </div>
+</header>
+
+<div class="page">
+  <div class="step-rail">
+    <div class="step clickable" onclick="tryGoStep(0)" id="se0"><div class="step-num active" id="sn0">1</div><span class="step-text active" id="st0">Upload</span></div>
+    <div class="step-line" id="sl01"></div>
+    <div class="step" id="se1"><div class="step-num" id="sn1">2</div><span class="step-text" id="st1">Verify</span></div>
+    <div class="step-line" id="sl12"></div>
+    <div class="step" id="se2"><div class="step-num" id="sn2">3</div><span class="step-text" id="st2">Sign</span></div>
+  </div>
+
+  <!-- STEP 0 -->
+  <div id="step0">
+    <div class="card">
+      <div class="card-title">Upload a document</div>
+      <div class="card-sub">Drag a file here or use your webcam. Supports Aadhaar, PAN, photo ID, PDF, CSV, JSON.</div>
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept="image/*,application/pdf,.csv,.json"/>
+        <div class="drop-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+        <div class="drop-label"><strong>Click to choose</strong> or drag file here</div>
+        <div class="drop-formats">PNG · JPG · PDF · CSV · JSON</div>
+      </div>
+      <div class="cam-row">
+        <button class="sm-btn" onclick="startCam()">Use webcam</button>
+        <button class="sm-btn" id="snapBtn" style="display:none" onclick="snap()">Take photo</button>
+        <button class="sm-btn" id="stopBtn" style="display:none" onclick="stopCam()">Stop</button>
+      </div>
+      <div class="nav-row" style="margin-top:20px">
+        <button class="primary-btn" id="uploadBtn" disabled onclick="doUpload()">
+          <svg viewBox="0 0 24 24"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/><path d="M5 20h14"/></svg>
+          Upload &amp; scan
+        </button>
+        <span class="file-chip" id="selectedName">No file selected</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step1" style="display:none">
+    <div class="card" id="scanCard" style="display:none">
+      <div class="card-title">Scan result</div>
+      <div id="scanBody"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Run a check</div>
+      <div class="card-sub">Choose what to verify. Fraud check is required to unlock signing.</div>
+      <div class="check-list">
+        <button class="check-btn" id="fraudBtn" onclick="doFraudCheck()">
+          <div class="check-icon ci-green"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></div>
+          <div><div class="check-label">Fraud check &amp; verify</div><div class="check-sub">Face similarity, document risk, outlier detection — unlocks signing</div></div>
+          <div class="check-arrow">→</div>
+        </button>
+        <button class="check-btn" onclick="doFaceMatch()">
+          <div class="check-icon ci-blue"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+          <div><div class="check-label">Face match</div><div class="check-sub">Upload a selfie to compare against enrolled faces in the database</div></div>
+          <div class="check-arrow">→</div>
+        </button>
+        <button class="check-btn" onclick="doOcr()">
+          <div class="check-icon ci-amber"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+          <div><div class="check-label">View extracted text</div><div class="check-sub">See the raw OCR output from the document</div></div>
+          <div class="check-arrow">→</div>
+        </button>
+      </div>
+    </div>
+    <div id="checkArea"></div>
+    <div id="signCTA" style="display:none">
+      <div class="card" style="background:var(--green-bg);border-color:var(--green-b)">
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px">
+            <div class="card-title" style="color:var(--green)">Document verified</div>
+            <div style="font-size:13px;color:#2a8a56;margin-top:3px">All checks passed. You can now create a cryptographic anchor to sign it permanently.</div>
+          </div>
+          <button class="primary-btn" style="background:var(--green);flex-shrink:0" onclick="goStep(2)">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Sign document →
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="nav-row"><button class="back-btn" onclick="goStep(0)">← Upload another</button></div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step2" style="display:none">
+    <div class="card">
+      <div class="card-title">Sign this document</div>
+      <div class="card-sub">Creates a tamper-proof Ed25519-signed anchor tied to this file. Cannot be undone or re-signed.</div>
+      <div class="anchor-already" id="alreadyWarn" style="display:none">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div class="anchor-already-text">This document has already been anchored and cannot be signed again.</div>
+      </div>
+      <div id="signForm">
+        <div class="input-row">
+          <label class="input-label">Full name (for vCard)</label>
+          <input class="text-input" id="vcardName" placeholder="e.g. Rahul Sharma"/>
+        </div>
+        <div class="input-row">
+          <label class="input-label">File ID</label>
+          <input class="text-input" id="anchorFid" placeholder="auto-filled" readonly style="background:var(--bg);color:var(--ink-2);font-family:monospace;font-size:12px"/>
+        </div>
+        <button class="primary-btn" id="signBtn" onclick="doSign()">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Create anchor &amp; sign
+        </button>
+      </div>
+      <div id="signResult" style="margin-top:18px"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Look up an anchor</div>
+      <div class="card-sub">Search by transaction ID or file ID to verify a signed record.</div>
+      <div class="search-row">
+        <input class="search-input" id="searchQ" placeholder="Enter txid or file_id…"/>
+        <button class="search-btn" onclick="doSearch()">Search</button>
+      </div>
+      <div id="searchRes"></div>
+    </div>
+    <div class="card">
+      <div class="slabel">Recent anchors</div>
+      <div id="ledger"><div class="empty-state"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>Loading…</div></div>
+    </div>
+    <div class="nav-row"><button class="back-btn" onclick="goStep(1)">← Back to checks</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-hdr">
+    <span class="drawer-title">Recent files</span>
+    <button class="drawer-x" onclick="closeDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="drawer-body" id="drawerBody"><div class="drawer-empty">Loading…</div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<canvas id="snapCanvas" style="display:none"></canvas>
+<video id="camVideo" autoplay playsinline style="display:none"></video>
+
+<script>
+const B = '';
+let file = null, stream = null, prevUrl = null, fid = null, fraudOk = false;
+let anchored = new Set();
+
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function toast(m, t) {
+  const el = document.getElementById('toast');
+  el.textContent = m;
+  el.className = 'toast show' + (t ? ' ' + t : '');
+  setTimeout(() => el.className = 'toast', 3500);
+}
+function rCls(s) { return s < 30 ? 'ok' : s < 60 ? 'warn' : 'bad'; }
+function rLbl(s) { return s < 30 ? 'Low risk' : s < 60 ? 'Medium risk' : 'High risk'; }
+function cCol(p) { return p >= 75 ? 'var(--green)' : p >= 50 ? 'var(--amber)' : 'var(--red)'; }
+function cLbl(p) { return p >= 75 ? 'Strong match' : p >= 50 ? 'Possible match' : 'No match'; }
+
+function gr(cells) {
+  return '<div class="grid2">' + cells.map(c =>
+    '<div class="cell' + (c.f ? ' full' : '') + '">' +
+    '<div class="cell-label">' + c.l + '</div>' +
+    '<div class="cell-val ' + (c.c || '') + '">' + c.v + '</div>' +
+    '</div>'
+  ).join('') + '</div>';
+}
+
+function goStep(n) {
+  [0, 1, 2].forEach(i => document.getElementById('step' + i).style.display = i === n ? '' : 'none');
+  for (let i = 0; i < 3; i++) {
+    const sn = document.getElementById('sn' + i), st = document.getElementById('st' + i), se = document.getElementById('se' + i);
+    sn.className = 'step-num'; st.className = 'step-text';
+    if (i < n) {
+      sn.className += ' done';
+      sn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+      st.className += ' done'; se.classList.add('clickable');
+    } else if (i === n) {
+      sn.className += ' active'; sn.textContent = i + 1;
+      st.className += ' active'; se.classList.remove('clickable');
+    } else {
+      sn.textContent = i + 1; se.classList.remove('clickable');
+    }
+  }
+  document.getElementById('sl01').className = 'step-line' + (n > 0 ? ' done' : '');
+  document.getElementById('sl12').className = 'step-line' + (n > 1 ? ' done' : '');
+  if (n === 2) { loadLedger(); checkAnchored(); }
+}
+
+function tryGoStep(n) {
+  if (n > 0 && !fid) { toast('Upload a document first', 'warn'); return; }
+  if (n > 1 && !fraudOk) { toast('Run fraud check first', 'warn'); return; }
+  goStep(n);
+}
+
+const dz = document.getElementById('dropZone');
+document.getElementById('fileInput').onchange = e => { const f = e.target.files[0]; if (f) setFile(f); };
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag');
+  const f = e.dataTransfer.files[0]; if (f) setFile(f);
+});
+
+function setFile(f) {
+  file = f;
+  document.getElementById('selectedName').textContent = f.name;
+  document.getElementById('uploadBtn').disabled = false;
+  if (f.type.startsWith('image/')) {
+    if (prevUrl) URL.revokeObjectURL(prevUrl);
+    prevUrl = URL.createObjectURL(f);
+    dz.innerHTML = '<img src="' + prevUrl + '" class="preview-img"/>';
+  } else {
+    dz.innerHTML = '<div class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" width="24" height="24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="drop-label">' + esc(f.name) + '</div>';
+  }
+}
+
+async function startCam() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    const v = document.getElementById('camVideo');
+    v.srcObject = stream;
+    v.style.cssText = 'display:block;width:100%;height:190px;object-fit:cover;border-radius:11px;';
+    dz.innerHTML = ''; dz.appendChild(v);
+    document.getElementById('snapBtn').style.display = '';
+    document.getElementById('stopBtn').style.display = '';
+  } catch (e) { toast('Camera access denied', 'err'); }
+}
+function snap() {
+  const v = document.getElementById('camVideo');
+  if (!stream) { toast('Start camera first', 'warn'); return; }
+  const c = document.getElementById('snapCanvas');
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  c.getContext('2d').drawImage(v, 0, 0);
+  c.toBlob(b => { setFile(new File([b], 'capture.jpg', { type: 'image/jpeg' })); stopCam(); }, 'image/jpeg', .9);
+}
+function stopCam() {
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  const v = document.getElementById('camVideo');
+  v.style.display = 'none'; v.srcObject = null;
+  document.getElementById('snapBtn').style.display = 'none';
+  document.getElementById('stopBtn').style.display = 'none';
+  if (!file) resetDz();
+}
+function resetDz() {
+  dz.innerHTML = '<input type="file" id="fileInput" accept="image/*,application/pdf,.csv,.json"/><div class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" width="24" height="24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div class="drop-label"><strong>Click to choose</strong> or drag file here</div><div class="drop-formats">PNG · JPG · PDF · CSV · JSON</div>';
+  document.getElementById('fileInput').onchange = e => { const f = e.target.files[0]; if (f) setFile(f); };
+}
+
+async function doUpload() {
+  if (!file) { toast('Select a file first', 'warn'); return; }
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true; btn.textContent = 'Uploading…';
+  try {
+    const fd = new FormData(); fd.append('file', file);
+    const r = await fetch(B + '/upload', { method: 'POST', body: fd });
+    if (!r.ok) throw new Error('Server error ' + r.status);
+    const j = await r.json(); if (j.error) throw new Error(j.error);
+    fid = j.file_id;
+    document.getElementById('anchorFid').value = j.file_id;
+    fraudOk = false;
+    showScan(j);
+    goStep(1);
+    toast('Document uploaded and scanned');
+  } catch (e) { toast(e.message, 'err'); }
+  finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/><path d="M5 20h14"/></svg> Upload &amp; scan';
+  }
+}
+
+function showScan(j) {
+  const dt = j.doc_type || 'unknown';
+  const dr = j.doc_report || {};
+  const ar = dr.aadhaar_report || null;
+  const pr = dr.pan_report || null;
+
+  // --- Face banner: 3 distinct states ---
+  const faceEnrolled = Boolean(j.face_enrolled);
+  const mlNote = (j.ml_metrics && j.ml_metrics.note) || '';
+  const poolCount = (j.ml_metrics && j.ml_metrics.pool_count) || 0;
+
+  let faceBanner = '';
+  if (!faceEnrolled) {
+    // No face detected in this document at all
+    faceBanner = `<div class="face-banner not-enrolled">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      No face detected in this document
+    </div>`;
+  } else if (mlNote === 'empty_pool') {
+    // Face extracted but nothing in DB to compare against yet
+    faceBanner = `<div class="face-banner pending">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Face extracted from document — no other records in database yet to compare against
+    </div>`;
+  } else {
+    // Face extracted and compared against pool
+    faceBanner = `<div class="face-banner enrolled">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Face extracted &amp; compared against ${poolCount} record(s) in database
+    </div>`;
+  }
+
+  let cells = [];
+  let badge = '';
+
+  if (dt === 'aadhaar' && ar) {
+    const f = ar.aadhaar_fields || {};
+    badge = '<span class="doc-tag dt-a">Aadhaar card</span>';
+    cells = [
+      { l: 'NAME', v: esc(f.name || '—') },
+      { l: 'DATE OF BIRTH', v: esc(f.dob || '—') },
+      { l: 'GENDER', v: esc(f.gender || '—') },
+      { l: 'UID (MASKED)', v: esc(f.aadhaar_masked || 'XXXX XXXX XXXX'), c: 'mono' }
+    ];
+    if (ar.risk_score != null) {
+      cells.push({ l: 'DOCUMENT RISK', v: rLbl(ar.risk_score), c: rCls(ar.risk_score) });
+    }
+  } else if (dt === 'pan' && pr) {
+    const f = pr.pan_fields || {};
+    badge = '<span class="doc-tag dt-p">PAN card</span>';
+    cells = [
+      { l: 'NAME', v: esc(f.name || '—') },
+      { l: 'PAN NUMBER', v: esc(f.pan_number || '—'), c: 'mono' },
+      { l: 'DATE OF BIRTH', v: esc(f.dob || '—') }
+    ];
+    if (pr.risk_score != null) {
+      cells.push({ l: 'DOCUMENT RISK', v: rLbl(pr.risk_score), c: rCls(pr.risk_score) });
+    }
+  } else if (dt === 'both') {
+    const af = ar ? ar.aadhaar_fields || {} : {};
+    const pf = pr ? pr.pan_fields || {} : {};
+    badge = '<span class="doc-tag dt-u">Aadhaar + PAN</span>';
+    cells = [
+      { l: 'NAME (AADHAAR)', v: esc(af.name || '—') },
+      { l: 'UID (MASKED)', v: esc(af.aadhaar_masked || 'XXXX XXXX XXXX'), c: 'mono' },
+      { l: 'NAME (PAN)', v: esc(pf.name || '—') },
+      { l: 'PAN NUMBER', v: esc(pf.pan_number || '—'), c: 'mono' },
+      { l: 'DOB (AADHAAR)', v: esc(af.dob || '—') },
+      { l: 'DOB (PAN)', v: esc(pf.dob || '—') }
+    ];
+    const risk = Math.max(ar ? ar.risk_score || 0 : 0, pr ? pr.risk_score || 0 : 0);
+    cells.push({ l: 'DOCUMENT RISK', v: rLbl(risk), c: rCls(risk) });
+  } else {
+    badge = '<span class="doc-tag dt-u">Unknown document</span>';
+    cells = [{ l: 'TYPE', v: 'Could not identify document type', f: true }];
+  }
+
+  document.getElementById('scanBody').innerHTML = badge + gr(cells) + faceBanner;
+  document.getElementById('scanCard').style.display = '';
+}
+
+async function doFraudCheck() {
+  if (!fid) { toast('Upload a document first', 'warn'); return; }
+  const btn = document.getElementById('fraudBtn');
+  btn.disabled = true;
+  document.getElementById('checkArea').innerHTML = '<div class="card"><div style="color:var(--ink-3);font-size:13px;padding:8px 0">Running fraud check…</div></div>';
+  document.getElementById('signCTA').style.display = 'none';
+  try {
+    const r = await fetch(B + '/final_verify', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_id: fid })
+    });
+    if (!r.ok) throw new Error('Server error ' + r.status);
+    const j = await r.json(); if (j.error) throw new Error(j.error);
+
+    const pass = j.passed;
+    const isInsufficient = !pass && !j.fraud; // empty pool case
+
+    const chips = (j.reasons || []).length
+      ? '<div class="chips">' + j.reasons.map(r => '<span class="chip-red">' + esc(r.replace(/_/g, ' ')) + '</span>').join('') + '</div>'
+      : '';
+
+    let verdictClass, iconSvg, title, desc;
+    if (pass) {
+      verdictClass = 'pass';
+      iconSvg = '<polyline points="20 6 9 17 4 12"/>';
+      title = 'Verified';
+      desc = 'All checks passed. Click "Sign document" below to anchor it.';
+    } else if (isInsufficient) {
+      verdictClass = 'warn';
+      iconSvg = '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+      title = 'Insufficient data';
+      desc = j.message || 'No other documents in DB to compare against yet.';
+    } else {
+      verdictClass = 'fail';
+      iconSvg = '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>';
+      title = 'Fraud detected';
+      desc = 'One or more checks failed. Document cannot be signed.';
+    }
+
+    const anch = pass && j.txid ? gr([
+      { l: 'TRANSACTION ID', v: esc(j.txid), c: 'mono', f: true },
+      { l: 'PUBLIC KEY FINGERPRINT', v: esc(j.pubkey_fingerprint || '—'), c: 'mono', f: true }
+    ]) : '';
+
+    document.getElementById('checkArea').innerHTML =
+      '<div class="card"><div class="verdict ' + verdictClass + '">' +
+      '<div class="verdict-icon"><svg viewBox="0 0 24 24">' + iconSvg + '</svg></div>' +
+      '<div style="flex:1"><div class="verdict-title">' + title + '</div>' +
+      '<div class="verdict-desc">' + esc(desc) + '</div>' + chips + '</div></div>' + anch + '</div>';
+
+    if (pass) { fraudOk = true; document.getElementById('signCTA').style.display = ''; }
+  } catch (e) { toast(e.message, 'err'); document.getElementById('checkArea').innerHTML = ''; }
+  finally { btn.disabled = false; }
+}
+
+// FIXED: Face match now requires a SEPARATE selfie upload, never uses the doc file itself
+async function doFaceMatch() {
+  const area = document.getElementById('checkArea');
+
+  // Step 1: Show upload zone for selfie
+  area.innerHTML = `
+    <div class="card">
+      <div class="slabel">Face match — upload a selfie</div>
+      <div class="info-box">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div class="info-box-text">Upload a <strong>different photo (selfie)</strong> to compare against faces enrolled in the database. 
+        This must be a different image from the document you uploaded.</div>
+      </div>
+      <div class="match-upload-zone" id="matchZone">
+        <input type="file" id="selfieInput" accept="image/*"/>
+        <div class="drop-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+        <div class="drop-label"><strong>Click to choose</strong> a selfie or photo</div>
+        <div class="drop-formats">PNG · JPG · JPEG</div>
+      </div>
+      <div id="selfiePreview" style="margin-bottom:12px;display:none">
+        <img id="selfieImg" style="width:100%;max-height:180px;object-fit:contain;border-radius:11px;border:1px solid var(--border)"/>
+      </div>
+      <button class="primary-btn" id="runMatchBtn" disabled onclick="runFaceMatch()">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Run face match
+      </button>
+    </div>`;
+
+  // Wire up selfie file input
+  document.getElementById('selfieInput').onchange = e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    window._selfieFile = f;
+    const url = URL.createObjectURL(f);
+    document.getElementById('selfieImg').src = url;
+    document.getElementById('selfiePreview').style.display = '';
+    document.getElementById('runMatchBtn').disabled = false;
+    // Show preview in zone
+    const zone = document.getElementById('matchZone');
+    zone.style.display = 'none';
+  };
+}
+
+async function runFaceMatch() {
+  const selfie = window._selfieFile;
+  if (!selfie) { toast('Choose a selfie image first', 'warn'); return; }
+
+  const btn = document.getElementById('runMatchBtn');
+  btn.disabled = true; btn.textContent = 'Matching…';
+
+  try {
+    const fd = new FormData();
+    fd.append('file', selfie);
+    // NOTE: we do NOT send file_id — we want to compare against ALL other records in DB
+    // (never against the just-uploaded document — that was the self-match bug)
+
+    const r = await fetch(B + '/match_biometric', { method: 'POST', body: fd });
+    const j = await r.json();
+
+    const area = document.getElementById('checkArea');
+
+    // Case 1: No face detected in selfie
+    if (!r.ok && j.error === 'no_face_in_probe') {
+      area.innerHTML = `<div class="card">
+        <div class="slabel">Face match result</div>
+        <div class="verdict fail" style="margin-bottom:0">
+          <div class="verdict-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+          <div><div class="verdict-title">No face detected</div>
+          <div class="verdict-desc">${esc(j.message || 'Could not detect a face in the uploaded selfie. Please try a clearer photo.')}</div></div>
+        </div>
+        <div style="margin-top:12px"><button class="sm-btn" onclick="doFaceMatch()">← Try again</button></div>
+      </div>`;
+      return;
+    }
+
+    if (!r.ok) throw new Error(j.error || j.message || 'Server error');
+
+    // Case 2: Self-match detected
+    if (j.self_match) {
+      area.innerHTML = `<div class="card">
+        <div class="slabel">Face match result</div>
+        <div class="verdict warn" style="margin-bottom:0">
+          <div class="verdict-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+          <div><div class="verdict-title">Same image detected</div>
+          <div class="verdict-desc">You uploaded the same image as the document. Please upload a <strong>separate selfie</strong> to run a real face comparison.</div></div>
+        </div>
+        <div style="margin-top:12px"><button class="sm-btn" onclick="doFaceMatch()">← Try again</button></div>
+      </div>`;
+      return;
+    }
+
+    // Case 3: No other records in DB
+    if (j.no_records || !j.best_match) {
+      area.innerHTML = `<div class="card">
+        <div class="slabel">Face match result</div>
+        <div class="verdict warn" style="margin-bottom:0">
+          <div class="verdict-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+          <div><div class="verdict-title">No records to compare</div>
+          <div class="verdict-desc">The database has no other enrolled face records to compare against. 
+          Upload more documents with faces first, then run face match.</div></div>
+        </div>
+        ${j.self_matches_skipped > 0 ? `<div style="margin-top:10px;font-size:12px;color:var(--ink-3)">ℹ️ ${j.self_matches_skipped} self-match(es) were skipped automatically.</div>` : ''}
+      </div>`;
+      return;
+    }
+
+    // Case 4: Real match result
+    const m = j.best_match;
+    const pct = m.confidence != null ? m.confidence : 0;
+    const col = cCol(pct);
+    const circ = 2 * Math.PI * 30;
+    const off = circ - (pct / 100) * circ;
+    const isMatch = pct >= 60;
+
+    area.innerHTML = `<div class="card">
+      <div class="slabel">Face match result</div>
+      <div class="conf-row">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 78 78">
+            <circle cx="39" cy="39" r="30" fill="none" stroke="var(--border)" stroke-width="6"/>
+            <circle cx="39" cy="39" r="30" fill="none" stroke="${col}" stroke-width="6" stroke-linecap="round"
+              stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/>
+          </svg>
+          <div class="ring-num" style="color:${col}">${pct}%</div>
+        </div>
+        <div>
+          <div class="conf-label" style="color:${col}">${cLbl(pct)}</div>
+          <div class="conf-sub">Cosine similarity: ${m.similarity != null ? m.similarity.toFixed(4) : '—'}</div>
+          <div class="conf-sub" style="margin-top:3px">Compared against ${esc(String(j.checked))} record(s)</div>
+        </div>
+      </div>
+      ${gr([
+        { l: 'DECISION', v: isMatch ? 'Match confirmed' : 'No match found', c: isMatch ? 'ok' : 'bad' },
+        { l: 'CONFIDENCE', v: pct + '%', c: isMatch ? 'ok' : 'bad' },
+        { l: 'MATCHED FILE', v: esc(m.filename || m.file_id || '—') },
+        { l: 'FILE ID', v: esc(m.file_id || '—'), c: 'mono' }
+      ])}
+      ${j.self_matches_skipped > 0 ? `<div style="font-size:12px;color:var(--ink-3);margin-top:4px">ℹ️ ${j.self_matches_skipped} self-match(es) excluded from results.</div>` : ''}
+    </div>`;
+
+  } catch (e) {
+    toast(e.message, 'err');
+    document.getElementById('checkArea').innerHTML = '';
+  } finally {
+    window._selfieFile = null;
+  }
+}
+
+async function doOcr() {
+  if (!file) { toast('Upload a document first', 'warn'); return; }
+  document.getElementById('checkArea').innerHTML = '';
+  try {
+    const fd = new FormData(); fd.append('file', file);
+    const r = await fetch(B + '/ocr_debug', { method: 'POST', body: fd });
+    if (!r.ok) throw new Error('Server error ' + r.status);
+    const j = await r.json(); if (j.error) throw new Error(j.error);
+    document.getElementById('checkArea').innerHTML =
+      '<div class="card"><div class="slabel">OCR extraction</div>' +
+      gr([{ l: 'ENGINE', v: esc(j.engine || '—') }, { l: 'CONTAINS DEVANAGARI', v: j.has_devanagari ? 'Yes' : 'No' }]) +
+      '<div class="slabel">Extracted text</div>' +
+      '<div class="ocr-box">' + esc(j.cleaned_text_preview || j.raw_text_preview || '(none)') + '</div></div>';
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+function checkAnchored() {
+  const f = document.getElementById('anchorFid').value;
+  const w = document.getElementById('alreadyWarn'), sf = document.getElementById('signForm');
+  if (f && anchored.has(f)) { w.style.display = ''; sf.style.opacity = '.4'; sf.style.pointerEvents = 'none'; }
+  else { w.style.display = 'none'; sf.style.opacity = ''; sf.style.pointerEvents = ''; }
+}
+
+async function doSign() {
+  const f = document.getElementById('anchorFid').value || fid;
+  const name = document.getElementById('vcardName').value.trim();
+  if (!f) { toast('No file — upload first', 'warn'); return; }
+  if (!name) { toast('Enter your name', 'warn'); return; }
+  if (anchored.has(f)) { toast('Already anchored — cannot sign again', 'err'); return; }
+  try {
+    const all = await fetch(B + '/anchors').then(r => r.json());
+    if (all.some(a => a.payload && a.payload.file_id === f)) {
+      anchored.add(f); checkAnchored();
+      toast('Already anchored — cannot sign again', 'err'); return;
+    }
+  } catch (e) {}
+  const btn = document.getElementById('signBtn');
+  btn.disabled = true; btn.textContent = 'Signing…';
+  try {
+    const r = await fetch(B + '/vcard', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_id: f, name })
+    });
+    if (!r.ok) throw new Error('Server error ' + r.status);
+    const j = await r.json(); if (j.error) throw new Error(j.error);
+    anchored.add(f); checkAnchored();
+    document.getElementById('signResult').innerHTML =
+      '<div class="verdict pass" style="margin-bottom:0"><div class="verdict-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+      '<div><div class="verdict-title">Document signed</div><div class="verdict-desc">An Ed25519-signed anchor has been created.</div></div></div>' +
+      '<div style="margin-top:14px">' +
+      gr([
+        { l: 'TRANSACTION ID', v: esc(j.txid || '—'), c: 'mono', f: true },
+        { l: 'SIGNATURE (PREVIEW)', v: j.signature ? esc(j.signature.slice(0, 52)) + '…' : '—', c: 'mono', f: true },
+        { l: 'PUBLIC KEY FINGERPRINT', v: esc(j.pubkey_fingerprint || '—'), c: 'mono', f: true }
+      ]) +
+      (j.vcard ? '<div class="slabel" style="margin-top:12px">vCard</div><div class="ocr-box">' + esc(j.vcard) + '</div>' : '') +
+      '</div>';
+    loadLedger();
+    toast('Document anchored and signed');
+  } catch (e) { toast(e.message, 'err'); }
+  finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Create anchor &amp; sign';
+  }
+}
+
+async function doSearch() {
+  const q = document.getElementById('searchQ').value.trim();
+  if (!q) { toast('Enter a txid or file_id', 'warn'); return; }
+  const area = document.getElementById('searchRes');
+  area.innerHTML = '<div style="font-size:13px;color:var(--ink-3);padding:8px 0">Searching…</div>';
+  try {
+    const all = await fetch(B + '/anchors').then(r => r.json());
+    const found = all.find(a => a.txid === q || (a.payload && a.payload.file_id === q));
+    if (!found) { area.innerHTML = '<div style="font-size:13px;color:var(--red);padding:8px 0">No anchor found for that ID.</div>'; return; }
+    area.innerHTML =
+      '<div class="verdict pass" style="margin-bottom:10px"><div class="verdict-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+      '<div><div class="verdict-title">Anchor found &amp; signed</div>' +
+      '<div class="verdict-desc">Signed on ' + esc((found.ts || '').replace('T', ' ').slice(0, 19)) + '</div></div></div>' +
+      gr([
+        { l: 'TRANSACTION ID', v: esc(found.txid || '—'), c: 'mono', f: true },
+        { l: 'FILE ID', v: esc(found.payload?.file_id || '—'), c: 'mono' },
+        { l: 'FILENAME', v: esc(found.payload?.meta?.filename || '—') },
+        { l: 'SHA-256', v: esc(found.payload?.sha256 || '—'), c: 'mono', f: true },
+        { l: 'PUBLIC KEY FINGERPRINT', v: esc(found.pubkey_fingerprint || '—'), c: 'mono', f: true }
+      ]);
+  } catch (e) { area.innerHTML = '<div style="font-size:13px;color:var(--red);padding:8px 0">' + esc(e.message) + '</div>'; }
+}
+
+async function loadLedger() {
+  const el = document.getElementById('ledger');
+  try {
+    const list = await fetch(B + '/anchors').then(r => r.json());
+    if (!list.length) {
+      el.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>No anchors yet</div>';
+      return;
+    }
+    el.innerHTML = list.slice(0, 12).map(a =>
+      '<div class="signed-entry">' +
+      '<div class="signed-dot"></div>' +
+      '<div style="flex:1;min-width:0"><div class="signed-txid">' + esc(a.txid || '') + '</div>' +
+      '<div class="signed-time">' + esc((a.ts || '').replace('T', ' ').slice(0, 19)) +
+      (a.payload?.meta?.filename ? ' · ' + esc(a.payload.meta.filename) : '') + '</div></div>' +
+      '<span class="signed-badge">signed</span></div>'
+    ).join('');
+    list.forEach(a => { if (a.payload?.file_id) anchored.add(a.payload.file_id); });
+  } catch (e) { el.innerHTML = '<div class="empty-state">Could not load</div>'; }
+}
+
+function openDrawer() {
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+  loadDrawer();
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+async function loadDrawer() {
+  const b = document.getElementById('drawerBody');
+  b.innerHTML = '<div class="drawer-empty">Loading…</div>';
+  try {
+    const j = await fetch(B + '/files?limit=50').then(r => r.json());
+    const files = j.files || [];
+    if (!files.length) { b.innerHTML = '<div class="drawer-empty">No files yet</div>'; return; }
+    b.innerHTML = '';
+    files.forEach(f => {
+      const el = document.createElement('div'); el.className = 'file-row';
+      el.innerHTML =
+        '<div class="file-row-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>' +
+        '<div style="flex:1;min-width:0"><div class="file-row-name">' + esc(f.filename) + '</div>' +
+        '<div class="file-row-id">' + esc(f.short_id || f.file_id) + '</div></div>';
+      el.onclick = () => {
+        fid = f.file_id;
+        document.getElementById('anchorFid').value = f.file_id;
+        closeDrawer(); toast('File selected: ' + f.filename); checkAnchored();
+      };
+      b.appendChild(el);
+    });
+  } catch (e) { b.innerHTML = '<div class="drawer-empty">Could not load files</div>'; }
+}
+
+async function checkServer() {
+  const p = document.getElementById('serverPill'), l = document.getElementById('serverLabel');
+  try {
+    const r = await fetch(B + '/files?limit=1');
+    if (r.ok) { p.className = 'pill pill-green'; l.textContent = 'Server online'; }
+    else { p.className = 'pill pill-red'; l.textContent = 'Server error'; }
+  } catch { p.className = 'pill pill-red'; l.textContent = 'Offline'; }
+}
+checkServer();
+</script>
+</body>
+</html>

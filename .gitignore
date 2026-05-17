@@ -1,0 +1,8 @@
+venv/
+.env
+__pycache__/ 
+keys/ 
+uploads/ 
+backup.txt 
+backup3.txt 
+backuphtml.txt 

@@ -1,0 +1,12 @@
+node_modules
+.git
+.gitignore
+__pycache__
+*.pyc
+*.log
+.env
+venv
+env
+*.mp4
+*.zip
+*.exe
